@@ -1,4 +1,3 @@
-
 # deploy_model_component.py
 from kfp.v2.dsl import component
 
@@ -9,7 +8,7 @@ from kfp.v2.dsl import component
 )
 def deploy_model(model_name: str, storage_uri: str):
     """
-    Deploy the model as an inference service with Kserve.
+    Deploy the model as an inference service with KServe.
     """
     import logging
     from kubernetes import client
@@ -24,26 +23,28 @@ def deploy_model(model_name: str, storage_uri: str):
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
 
+    logger.info("Starting model deployment")
+
     model_uri = f"{storage_uri}/{model_name}"
     logger.info(f"MODEL URI: {model_uri}")
 
     namespace = 'kserve-inference'
-    kserve_version='v1beta1'
+    kserve_version = 'v1beta1'
     api_version = constants.KSERVE_GROUP + '/' + kserve_version
 
     isvc = V1beta1InferenceService(
-        api_version = api_version,
-        kind = constants.KSERVE_KIND,
-        metadata = client.V1ObjectMeta(
-            name = model_name,
-            namespace = namespace,
-            annotations = {'sidecar.istio.io/inject':'false'}
+        api_version=api_version,
+        kind=constants.KSERVE_KIND,
+        metadata=client.V1ObjectMeta(
+            name=model_name,
+            namespace=namespace,
+            annotations={'sidecar.istio.io/inject': 'false'}
         ),
-        spec = V1beta1InferenceServiceSpec(
+        spec=V1beta1InferenceServiceSpec(
             predictor=V1beta1PredictorSpec(
                 service_account_name="kserve-sa",
                 min_replicas=1,
-                max_replicas = 1,
+                max_replicas=1,
                 sklearn=V1beta1SKLearnSpec(
                     storage_uri=model_uri,
                     resources=V1ResourceRequirements(
@@ -54,6 +55,6 @@ def deploy_model(model_name: str, storage_uri: str):
             )
         )
     )
+
     KServe = KServeClient()
     KServe.create(isvc)
-# funny comment2
