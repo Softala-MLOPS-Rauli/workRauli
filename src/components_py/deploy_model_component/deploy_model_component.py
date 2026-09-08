@@ -56,3 +56,4 @@ def deploy_model(model_name: str, storage_uri: str):
     )
     KServe = KServeClient()
     KServe.create(isvc)
+# funny comment2
