@@ -3,12 +3,13 @@ import kfp
 import sys
 
 sys.path.append('../src')
+from kfp_config import get_kfp_endpoint
 from pipelines.pipeline_definitions.pipeline_definition import pipeline
 from pipelines.pipeline_arg.pipeline_arg import arguments
 
 def submit_pipeline():
 
-    client = kfp.Client() 
+    client = kfp.Client(host=get_kfp_endpoint())
     
 
     # Define your experiment and run name
