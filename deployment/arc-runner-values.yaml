@@ -12,10 +12,15 @@ template:
     automountServiceAccountToken: false
     securityContext:
       runAsNonRoot: true
+      runAsUser: 1001
+      runAsGroup: 1001
       seccompProfile:
         type: RuntimeDefault
     containers:
       - name: runner
+        image: ghcr.io/actions/actions-runner:latest
+        command:
+          - /home/runner/run.sh
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
