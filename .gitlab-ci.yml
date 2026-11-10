@@ -1,0 +1,30 @@
+stages:
+  - validate
+  - submit
+
+default:
+  image: python:3.10
+  tags:
+    - kubernetes
+
+install:
+  stage: validate
+  script:
+    - python -m pip install --upgrade pip
+    - pip install -r requirements.txt
+    - python -m compileall -q src
+
+submit-pipeline:
+  stage: submit
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "development"'
+      changes:
+        - src/**
+        - notebooks/**
+        - requirements.txt
+  variables:
+    KFP_ENDPOINT: http://ml-pipeline.kubeflow.svc.cluster.local:8888
+  script:
+    - python -m pip install --upgrade pip
+    - pip install -r requirements.txt
+    - python src/submit_run.py
